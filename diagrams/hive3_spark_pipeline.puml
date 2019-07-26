@@ -1,0 +1,34 @@
+@startuml
+database Source
+actor ServiceAccount
+boundary Spark #aqua
+control "Hive Warehouse\nConnector (HWC)" as hwc #turquoise
+entity "Spark Version\nof Table X" as st #blue
+database HDFS #magenta
+collections "Spark Catalog" as sc #aqua
+collections "Hive Catalog" as hc #lime
+entity "Hive Version\nof Table X" as ht #teal
+boundary Hive #lime
+actor Analyst
+
+
+== Workflow (Spark)==
+autonumber
+ServiceAccount -> Spark: Using\n(runs as\n'ServiceAccount')
+Spark -> Source: Retrieves Dataset\n(Files or Streaming)
+Spark <-> st: Defines
+Spark <-> sc: Saves Table Definition
+Spark -> hwc: using
+hwc -> hc: Saves Table Definition
+Spark -> HDFS: Saves Dataset (with \npermissions of 'ServiceAccount')
+
+== Workflow (Hive) ==
+autonumber
+Analyst -> Hive: Using\n(impersonation or not)
+Hive -> Hive: Impersonation or Not
+Hive -> ht: Retrieves
+Hive -> hc: table definition from
+Hive -> HDFS: reads files from
+Hive -> Hive: Plan and Execute
+Hive -> Analyst: Returns
+@enduml

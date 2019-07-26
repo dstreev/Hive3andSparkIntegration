@@ -1,0 +1,24 @@
+@startuml
+database Source
+actor ServiceAccount
+boundary Spark
+entity table
+database HDFS
+collections Metastore
+boundary Hive
+actor Analyst
+
+
+== Workflow (Spark)==
+ServiceAccount -> Spark: Using\n(runs as 'ServiceAccount')
+Spark -> Source: Retrieves Dataset\n(Files or Streaming)
+Spark -> table: Defines
+Spark -> Metastore: Saves Table
+Spark -> HDFS: Saves Dataset (with \npermissions of 'ServiceAccount')
+
+== Workflow (Hive) ==
+Analyst -> Hive: Using (impersonation or not)
+Hive -> table: Retrieves
+Hive -> Metastore: table definition from
+Hive -> HDFS: reads files from
+@enduml

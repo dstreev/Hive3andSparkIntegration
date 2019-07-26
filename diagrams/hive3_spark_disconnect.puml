@@ -1,0 +1,37 @@
+@startuml
+database Source
+actor ServiceAccount
+boundary Spark #aqua
+entity spark_table #blue
+database HDFS #magenta
+collections "Spark Catalog" #aqua
+control "disconnect" #red
+collections "Hive Catalog" #lime
+entity hive_table #teal
+boundary Hive #lime
+actor Analyst
+
+
+== Workflow (Spark)==
+ServiceAccount -> Spark: Using\n(runs as 'ServiceAccount')
+Spark -> Source: Retrieves Dataset\n(Files or Streaming)
+Spark -> spark_table: Defines
+Spark -> "Spark Catalog": Saves Table Definition
+Spark -> HDFS: Saves Dataset (with \npermissions of 'ServiceAccount')
+
+== The Missing Integration ==
+
+disconnect --> "Spark Catalog"
+note right
+The separation of catalog's was necessary
+to protect data integrity. Unfortunately, to
+close the gap we need to modify our workflow.
+end note
+disconnect --> "Hive Catalog":
+
+== Workflow (Hive) ==
+Analyst -> Hive: Using\n(impersonation or not)
+Hive -> hive_table: Retrieves
+Hive -> "Hive Catalog": table definition from
+Hive -> HDFS: reads files from
+@enduml
